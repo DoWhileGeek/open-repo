@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+
+import argparse
+import re
+import sys
+import subprocess
+import webbrowser
+
+
+def fetch_remote(remote_name):
+    output = subprocess.check_output(["git", "remote", "-v"]).decode("utf-8")
+
+    lines = output.split("\n")
+    lines = [line for line in lines if line]
+
+    remotes = []
+    for line in lines:
+        split = line.strip("(fetch)").strip("(push)").strip().split("\t")
+        remotes.append(tuple(split))
+
+    remotes = set(remotes)
+
+    for remote in remotes:
+        if remote[0] == remote_name:
+            return remote[1]
+
+
+def parse_remote(remote_url):
+    match = None
+
+    if remote_url is None:
+        print("Invalid remote")
+        sys.exit(0)
+    elif remote_url.startswith("https://"): # avoid having to potentially use both regexs
+        match = re.match(r"^https://(?P<domain>\w+.\w+)/(?P<username>.+)/(?P<repository>.+).git$", remote_url)
+    else:
+        match = re.match(r"^git@(?P<domain>\w+.\w+):(?P<username>.+)/(?P<repository>.+).git$", remote_url)
+
+    if not match:
+        print("Could not parse remote url")
+        sys.exit(0)
+
+    url = "http://{domain}/{username}/{repository}".format(**match.groupdict())
+
+    webbrowser.open_new_tab(url)
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="A command line utility for opening a repositories remote homepage.")
+    parser.add_argument("-r", "--remote", required=False, default="origin", help="remote to open. default: origin")
+    args = parser.parse_args()
+
+    return vars(args)
+
+def main():
+    args = parse_args()
+
+    parse_remote(fetch_remote(args["remote"]))
+
+
+main()
