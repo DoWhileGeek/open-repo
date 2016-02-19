@@ -7,7 +7,7 @@ import subprocess
 import webbrowser
 
 
-def fetch_remote(remote_name):
+def fetch_remote():
     try:
         output = subprocess.check_output(["git", "remote", "-v"]).decode("utf-8")
     except subprocess.CalledProcessError:
@@ -23,9 +23,7 @@ def fetch_remote(remote_name):
 
     remotes = set(remotes)
 
-    for remote in remotes:
-        if remote[0] == remote_name:
-            return remote[1]
+    return {remote: url for remote, url in remotes}
 
 
 def parse_remote(remote_url):
@@ -50,7 +48,7 @@ def parse_remote(remote_url):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="A command line utility for opening a repositories remote homepage.")
-    parser.add_argument("-r", "--remote", required=False, default="origin", help="remote to open. default: origin")
+    parser.add_argument("-r", "--remote", required=False, help="remote to open. default: origin")
     args = parser.parse_args()
 
     return vars(args)
@@ -58,7 +56,22 @@ def parse_args():
 def main():
     args = parse_args()
 
-    parse_remote(fetch_remote(args["remote"]))
+    remotes = fetch_remote()
+
+    remote = None
+    if remotes.get(args["remote"]):
+        remote = remotes[args["remote"]]
+    elif remotes.get("origin"):
+        remote = remotes["origin"]
+    elif len(remotes.keys()) <= 1:
+        for value in remotes.values():
+            remote = value
+            break
+    else:
+        print("No remotes found")
+        sys.exit(0)
+
+    parse_remote(remote)
 
 
 main()
