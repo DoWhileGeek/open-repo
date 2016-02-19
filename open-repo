@@ -8,7 +8,10 @@ import webbrowser
 
 
 def fetch_remote(remote_name):
-    output = subprocess.check_output(["git", "remote", "-v"]).decode("utf-8")
+    try:
+        output = subprocess.check_output(["git", "remote", "-v"]).decode("utf-8")
+    except subprocess.CalledProcessError:
+        sys.exit(0)
 
     lines = output.split("\n")
     lines = [line for line in lines if line]
