@@ -12,4 +12,5 @@ Opens a browser tab. By default it opens the 'origin' remote. Otherwise you can 
 `$ open-repo --remote alt_origin`
 
 Open a repo thats in another directory:
+
 `$ open-repo ../workwork`
