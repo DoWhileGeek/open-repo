@@ -2,6 +2,8 @@
 A command line utility for opening a repositories remote homepage.
 
 ## Installation:
+open-repo doesnt require any other external packages to function, so it doesnt polute your site-packages.
+
 `pip install open-repo`
 
 ## Usage:
