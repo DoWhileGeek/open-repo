@@ -32,7 +32,7 @@ def main():
         author="Joeseph Rodrigues",
         author_email="dowhilegeek@gmail.com",
         version=get_version(),
-        scripts=["open-repo"]
+        scripts=["open-repo", "open-pr"]
     )
 
 
